@@ -18,7 +18,7 @@
 
 	
 
-	<test name="Login Page Test_chrome">
+	<test name="Login Page Test">
 		
 
 		<classes>
@@ -31,16 +31,6 @@
 		</classes>
 	</test>
 	
-	 <!--<test name="product Info Page Test">
-       <classes>
-			<class name="com.qa.opencart.test.ProductPageInfoTest" />
-		</classes>
-	</test>
 	
-	<test name="Register Page Test">
-       <classes>
-			<class name="com.qa.opencart.test.RegisterPageTest" />
-		</classes>
-	</test> -->
 
 </suite>
