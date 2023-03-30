@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Properties;
 //import java.util.logging.FileHandler;
 
+import org.aspectj.util.FileUtil;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -106,7 +107,7 @@ public class DriverFactory {
 						break;
 
 					default:
-						System.out.println("....Wrong env is passed....No need to run the test cases....");
+						System.out.println("....Wrong env is passed..No need to run the test case...");
 						
 					// break;
 					}
@@ -133,7 +134,7 @@ public class DriverFactory {
 		String path = System.getProperty("user.dir") + "/screenshot/" + System.currentTimeMillis() + ".png";
 		File destination = new File(path);
 		try {
-			FileHandler.copy(srcFile, destination);
+			FileUtil.copyFile(srcFile, destination);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
