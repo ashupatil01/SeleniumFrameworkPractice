@@ -26,7 +26,7 @@ package com.qa.opencart.factory;
 			if(Boolean.parseBoolean(prop.getProperty("headless").trim()))
 				{
 				System.out.println("=========Running chrome in headless==========");
-				co.addArguments("--headless");
+				co.addArguments();
 				
 				}
 			if(Boolean.parseBoolean(prop.getProperty("incognito").trim())) co.addArguments("--incognito");
