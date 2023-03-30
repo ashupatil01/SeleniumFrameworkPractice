@@ -65,7 +65,7 @@ import org.testng.annotations.DataProvider;
 
 		@DataProvider
 		public Object[][] getProductTestData() {
-			return new Object[][] { { "Macbook", "MacBook Pro" }, { "Macbook", "MacBook Air" }, { "iMac", "iMac" },
+			return new Object[][] { { "Macbook"}, { "Macbook", }, { "iMac", "iMac" },
 					{ "Apple", "Apple Cinema 30\"" }, { "Samsung", "Samsung SyncMaster 941BW" },
 					{ "Samsung", "Samsung Galaxy Tab 10.1" }, };
 		}
