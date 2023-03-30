@@ -19,8 +19,6 @@
 	
 
 	<test name="Login Page Test">
-		
-
 		<classes>
 			<class name="com.qa.opencart.test.LoginPageTest" />
 		</classes>
