@@ -40,7 +40,7 @@ import org.testng.annotations.DataProvider;
 		@Test
 		public void accPageHeadersCountTest() {
 			List<String> actualAccPageHeadersList = accPage.getAccountsPageHeadersList();
-			System.out.println("Acc Page Headers List: " + actualAccPageHeadersList);
+			System.out.println("Acc Page Headers List are: " + actualAccPageHeadersList);
 			Assert.assertEquals(actualAccPageHeadersList.size(), AppConstants.ACCOUNTS_PAGE_HEADERS_COUNT);
 		}
 
