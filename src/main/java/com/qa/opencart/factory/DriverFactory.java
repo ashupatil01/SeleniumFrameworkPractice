@@ -4,71 +4,137 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
-//import java.util.logging.FileHandler;
-
 import org.aspectj.util.FileUtil;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-//import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
-//import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.io.FileHandler;
-//import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
+import com.qa.opencart.exception.FrameworkException;
+
 public class DriverFactory {
+
 	public WebDriver driver;
 	public Properties prop;
 	public OptionsManager optionsManager;
-	
-	public static String highlight;
-	
-	public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<WebDriver>();
 
+	public static String highlight;
+
+	public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<WebDriver>();
+	
+    //private final Logger logger = Logger.getLogger(DriverFactory.class);
+
+    
+
+	/**
+	 * this method is initializing the driver on the basis of given browser name
+	 * 
+	 * @param browserName
+	 * @return this returns the driver
+	 */
 	public WebDriver initDriver(Properties prop) {
-		optionsManager =  new OptionsManager(prop);
+
+
+		optionsManager = new OptionsManager(prop);
+
 		highlight = prop.getProperty("highlight").trim();
 		String browserName = prop.getProperty("browser").toLowerCase().trim();
+		// String browserName = system.getProperty("browser");
 
 		System.out.println("browser name is : " + browserName);
+		//logger.info("browser name is : \" + browserName");
 
+		// chrome:
 		if (browserName.equalsIgnoreCase("chrome")) {
-//			ChromeOptions co = new ChromeOptions();
-//			co.addArguments("--remorte-allow-origins=*");
-			//driver = new ChromeDriver();
-			tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+				// run on remote/grid:
+				init_remoteDriver("chrome");
+			} else {
+				// local execution
+				tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			}
+
 		}
-		if (browserName.equalsIgnoreCase("firefox")) {
-//			FirefoxOptions fo = new FirefoxOptions();
-//			fo.addArguments("--remorte-allow-origins=*");
-			//driver = new FirefoxDriver();
-			tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+
+		// firefox:
+		else if (browserName.equalsIgnoreCase("firefox")) {
+			if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+				// run on remote/grid:
+				init_remoteDriver("firefox");
+			} else {
+				tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+
+			}
 		}
-		if (browserName.equalsIgnoreCase("safari")) {
-			//driver = new SafariDriver();
+
+		// edge:
+		else if (browserName.equalsIgnoreCase("edge")) {
+			if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+				// run on remote/grid:
+				init_remoteDriver("edge");
+			} else {
+				tlDriver.set(new EdgeDriver(optionsManager.getEdgeOptions()));
+			}
+		}
+
+		// safari:
+		else if (browserName.equalsIgnoreCase("safari")) {
 			tlDriver.set(new SafariDriver());
-			
 		}
-		if (browserName.equalsIgnoreCase("edge")) {
-//			EdgeOptions eo = new EdgeOptions();
-//			eo.addArguments("--remorte-allow-origins=*");
-			//driver = new EdgeDriver();
-			tlDriver.set(new EdgeDriver(optionsManager.getEdgeOptions()));
-			
-		} else {
-			System.out.println("plz pass the right browser  : " + browserName);
+
+		else {
+			System.out.println("plz pass the right browser name...." + browserName);
+			//logger.error("plz pass the right browser name...." + browserName);
+			throw new FrameworkException("NO BROWSER FOUND EXCEPTION....");
 		}
-		 getDriver().manage().deleteAllCookies();
-		 getDriver().manage().window().maximize();
-		 getDriver().get(prop.getProperty("url"));
+
+		getDriver().manage().deleteAllCookies();
+		getDriver().manage().window().maximize();
+		getDriver().get(prop.getProperty("url").trim());
 		return getDriver();
 
 	}
-	
+
+	/**
+	 * this method is called internally to initialize the driver with
+	 * RemoteWebDriver
+	 * 
+	 * @param browser
+	 */
+	private void init_remoteDriver(String browser) {
+		
+		System.out.println("Running tests on grid server:::" + browser);
+		
+		try {
+			switch (browser.toLowerCase()) {
+			case "chrome":
+				tlDriver.set(
+						new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getChromeOptions()));
+				break;
+			case "firefox":
+				tlDriver.set(
+						new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getFirefoxOptions()));
+				break;
+			case "edge":
+				tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getEdgeOptions()));
+				break;
+			default:
+				System.out.println("plz pass the right browser for remote execution..." + browser);
+				throw new FrameworkException("NOREMOTEBROWSEREXCEPTION");
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/*
 	 * get the local thread copy of the driver
 	 */
@@ -76,55 +142,58 @@ public class DriverFactory {
 		return tlDriver.get();
 	}
 
-	
+	/**
+	 * this method is reading the properties from the .properties file
+	 * 
+	 * @return
+	 */
+	public Properties initProp() {
 
-		public Properties initProp() {
+		// mvn clean install -Denv="qa"
+		// mvn clean install
+		prop = new Properties();
+		FileInputStream ip = null;
+		String envName = System.getProperty("env");
+		System.out.println("Running test cases on Env: " + envName);
 
-			// mvn clean install -Denv="qa"
-			// mvn clean install
-			prop = new Properties();
-			FileInputStream ip = null;
-			String envName = System.getProperty("env");
-			System.out.println("Running test cases on Env: " + envName);
-
-			try {
-				if (envName == null) {
-					System.out.println("no env is passed....Running tests on QA env...");
+		try {
+			if (envName == null) {
+				System.out.println("no env is passed....Running tests on QA env...");
+				ip = new FileInputStream("./src/test/resources/config/qa.config.properties");
+			} else {
+				switch (envName.toLowerCase().trim()) {
+				case "qa":
 					ip = new FileInputStream("./src/test/resources/config/qa.config.properties");
-				} else {
-					switch (envName.toLowerCase().trim()) {
-					case "qa":
-						ip = new FileInputStream("./src/test/resources/config/qa.config.properties");
-						break;
-					case "stage":
-						ip = new FileInputStream("./src/test/resources/config/stage.config.properties");
-						break;
-					case "dev":
-						ip = new FileInputStream("./src/test/resources/config/dev.config.properties");
-						break;
-					case "prod":
-						ip = new FileInputStream("./src/test/resources/config/config.properties");
-						break;
+					break;
+				case "stage":
+					ip = new FileInputStream("./src/test/resources/config/stage.config.properties");
+					break;
+				case "dev":
+					ip = new FileInputStream("./src/test/resources/config/dev.config.properties");
+					break;
+				case "prod":
+					ip = new FileInputStream("./src/test/resources/config/config.properties");
+					break;
 
-					default:
-						System.out.println("....Wrong env is passed..No need to run the test case...");
-						
-					// break;
-					}
-
+				default:
+					System.out.println("....Wrong env is passed....No need to run the test cases....");
+					throw new FrameworkException("WRONG ENV IS PASSED...");
+				// break;
 				}
-			} catch (FileNotFoundException e) {
 
 			}
+		} catch (FileNotFoundException e) {
 
-			try {
-				prop.load(ip);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return prop;
 		}
+
+		try {
+			prop.load(ip);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return prop;
+	}
 
 	/**
 	 * take screenshot

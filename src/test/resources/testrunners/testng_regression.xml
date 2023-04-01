@@ -15,20 +15,37 @@
 			class-name="com.qa.opencart.listeners.AnnotationTransformer" />
 	</listeners>
 
+	<test name="Login Page Test_chrome_90.0">
+		<parameter name="browser" value="chrome" />
+		<parameter name="browserversion" value="90.0" />
+		<parameter name="testcasename" value="Login Page Test" />
 
-	
 
-	<test name="Login Page Test">
+
 		<classes>
 			<class name="com.qa.opencart.test.LoginPageTest" />
 		</classes>
 	</test>
-	 <test name="Accounts Page Test">
-       <classes>
+
+	 <test name="Login Page Test_chrome_109.0">
+		<parameter name="browser" value="chrome" />
+		<parameter name="browserversion" value="109.0" />
+		<parameter name="testcasename" value="Login Page Test" />
+		<classes>
+			<class name="com.qa.opencart.test.LoginPageTest" />
+		</classes>
+	</test>
+	<test name="Accounts Page Test_chrome_79">
+		<parameter name="browser" value="chrome" />
+		<parameter name="browserversion" value="79.0" />
+		<parameter name="testcasename" value="Accounts Page Test" />
+		<classes>
 			<class name="com.qa.opencart.test.AccountsPageTest" />
 		</classes>
 	</test>
-	
+
+
+
 	
 
 </suite>
